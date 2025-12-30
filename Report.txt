@@ -1,0 +1,54 @@
+# Lab Assignment Report: Lexical Analyzer Implementation
+
+## 1. Introduction
+The objective of this lab was to implement a **lexical analyzer** in the **C programming language** without using any external tools like Lex or Flex. The analyzer is designed to recognize specific lexical units: identifiers, relational operators, and a specific command structure.
+
+## 2. Lexical Units
+The implementation recognizes the following tokens:
+
+### 2.1 Identifiers
+Defined by the regular expression `[a-zA-Z][a-zA-Z0-9]*`. These are used for command names and arguments.
+
+### 2.2 Relational Operators
+The analyzer recognizes the following operators:
+- `<` (Less than)
+- `>` (Greater than)
+- `<=` (Less than or equal to)
+- `>=` (Greater than or equal to)
+- `==` (Equal to)
+- `<>` (Not equal to)
+
+### 2.3 Command Structure
+A command consists of:
+1.  **Command Name**: An identifier.
+2.  **Arguments**: An optional list of identifiers.
+3.  **Options**: An optional list enclosed in `[` and `]`, containing single-character options preceded by a hyphen (e.g., `-a`), separated by commas.
+
+## 3. Implementation Details
+The lexical analyzer is implemented using a simple state-based approach in C.
+
+### 3.1 Token Structure
+A `Token` structure was defined to store the type of the token and its corresponding lexeme:
+```c
+typedef struct {
+    TokenType type;
+    char lexeme[256];
+} Token;
+```
+
+### 3.2 Scanning Logic
+The `get_next_token()` function reads the input string character by character:
+-   **Whitespace**: Skipped automatically.
+-   **Identifiers**: Recognized by checking for an initial letter followed by alphanumeric characters.
+-   **Operators**: Recognized by checking for `<`, `>`, `=`, and `!`, then looking ahead for a second character (like `=` or `>`).
+-   **Symbols**: Single characters like `[`, `]`, `,`, and `-` are recognized as specific tokens to support the command syntax.
+
+## 4. Testing
+The implementation was tested with various inputs, including:
+-   `macom arg1 arg2 [-a,-b]`
+-   `macom [-f]`
+-   `macom`
+-   Relational expressions like `x <= y` and `a <> b`.
+
+## 5. Conclusion
+The lexical analyzer successfully identifies all required lexemes and handles the specified command format. The implementation adheres to the constraint of using only standard C without Lex/Flex.
