@@ -1,54 +1,32 @@
-# Lab Assignment Report: Lexical Analyzer Implementation
+# Lab Report: Eliminating ε-Transitions from an NFA
 
-## 1. Introduction
-The objective of this lab was to implement a **lexical analyzer** in the **C programming language** without using any external tools like Lex or Flex. The analyzer is designed to recognize specific lexical units: identifiers, relational operators, and a specific command structure.
+## 1. Objective
+The goal of this lab was to implement a C program that converts a Non-Deterministic Finite Automaton with ε-transitions (ε-NFA) into an equivalent NFA without ε-transitions. This is a fundamental step in the process of converting a regular expression to a Deterministic Finite Automaton (DFA).
 
-## 2. Lexical Units
-The implementation recognizes the following tokens:
+## 2. Theoretical Background
+An ε-NFA allows transitions on the empty string (ε), meaning the automaton can change states without consuming any input symbol. To eliminate these:
+1.  **ε-closure**: For each state $q$, we find the set of all states reachable from $q$ using only ε-transitions.
+2.  **New Transitions**: For a state $q$ and symbol $a$, the new transition function $\delta'$ is defined as:
+    $$\delta'(q, a) = \epsilon\text{-closure}(\delta(\epsilon\text{-closure}(q), a))$$
+3.  **New Final States**: A state $q$ becomes a final state in the new NFA if its ε-closure contains at least one final state from the original ε-NFA.
 
-### 2.1 Identifiers
-Defined by the regular expression `[a-zA-Z][a-zA-Z0-9]*`. These are used for command names and arguments.
+## 3. Implementation Modules
+The program is structured into five main tasks as requested:
 
-### 2.2 Relational Operators
-The analyzer recognizes the following operators:
-- `<` (Less than)
-- `>` (Greater than)
-- `<=` (Less than or equal to)
-- `>=` (Greater than or equal to)
-- `==` (Equal to)
-- `<>` (Not equal to)
+### Task 1: Read the NFA
+The `read_nfa` function collects the number of states, the alphabet, transitions (including ε), the start state, and the set of final states from the user.
 
-### 2.3 Command Structure
-A command consists of:
-1.  **Command Name**: An identifier.
-2.  **Arguments**: An optional list of identifiers.
-3.  **Options**: An optional list enclosed in `[` and `]`, containing single-character options preceded by a hyphen (e.g., `-a`), separated by commas.
+### Task 2: Calculate ε-closure
+The `calculate_epsilon_closure` function uses a transitive closure algorithm to find all states reachable via ε-transitions for every state in the NFA.
 
-## 3. Implementation Details
-The lexical analyzer is implemented using a simple state-based approach in C.
+### Task 3: Compute New Transitions
+The `convert_to_nfa` function implements the formula $\delta'(q, a) = \epsilon\text{-closure}(\delta(\epsilon\text{-closure}(q), a))$ to build the transition table for the new NFA.
 
-### 3.1 Token Structure
-A `Token` structure was defined to store the type of the token and its corresponding lexeme:
-```c
-typedef struct {
-    TokenType type;
-    char lexeme[256];
-} Token;
-```
+### Task 4: Determine New Final States
+Within the same conversion function, the program checks if any state in a state's ε-closure is a final state. If so, that state is marked as final in the new NFA.
 
-### 3.2 Scanning Logic
-The `get_next_token()` function reads the input string character by character:
--   **Whitespace**: Skipped automatically.
--   **Identifiers**: Recognized by checking for an initial letter followed by alphanumeric characters.
--   **Operators**: Recognized by checking for `<`, `>`, `=`, and `!`, then looking ahead for a second character (like `=` or `>`).
--   **Symbols**: Single characters like `[`, `]`, `,`, and `-` are recognized as specific tokens to support the command syntax.
+### Task 5: Display the New Automaton
+The `display_nfa` function prints the resulting NFA's states, alphabet, start state, final states, and the complete transition table in a readable format.
 
-## 4. Testing
-The implementation was tested with various inputs, including:
--   `macom arg1 arg2 [-a,-b]`
--   `macom [-f]`
--   `macom`
--   Relational expressions like `x <= y` and `a <> b`.
-
-## 5. Conclusion
-The lexical analyzer successfully identifies all required lexemes and handles the specified command format. The implementation adheres to the constraint of using only standard C without Lex/Flex.
+## 4. Conclusion
+The implementation successfully automates the removal of ε-transitions, providing a clean NFA ready for further processing, such as determinization using the subset construction algorithm.
